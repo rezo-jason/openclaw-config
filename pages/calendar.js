@@ -1,5 +1,6 @@
+import { useState } from "react";
 import Layout from "@/components/Layout";
-import { Bot, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bot, Clock, RefreshCw, ChevronLeft, ChevronRight, Filter, ChevronDown, X } from "lucide-react";
 
 const agentColors = {
   "Main Coordinator": "bg-blue-500",
@@ -46,7 +47,29 @@ const cronJobs = [
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 
+const allAgents = Object.keys(agentColors);
+
 export default function Calendar() {
+  const [selectedAgents, setSelectedAgents] = useState(allAgents);
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const toggleAgent = (agent) => {
+    if (selectedAgents.includes(agent)) {
+      if (selectedAgents.length === 1) return; // Keep at least one selected
+      setSelectedAgents(selectedAgents.filter((a) => a !== agent));
+    } else {
+      setSelectedAgents([...selectedAgents, agent]);
+    }
+  };
+
+  const selectAll = () => setSelectedAgents(allAgents);
+  const isAllSelected = selectedAgents.length === allAgents.length;
+
+  // Filter data based on selected agents
+  const filteredEvents = events.filter((e) => selectedAgents.includes(e.agent));
+  const filteredAlwaysRunning = alwaysRunning.filter((a) => selectedAgents.includes(a.name));
+  const filteredCronJobs = cronJobs.filter((j) => selectedAgents.includes(j.agent));
+
   return (
     <Layout title="Calendar">
       <div className="grid-floor min-h-screen">
@@ -57,7 +80,60 @@ export default function Calendar() {
               <h1 className="text-2xl font-bold text-white mb-2">Calendar</h1>
               <p className="text-gray-500">Schedule and recurring automations</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              {/* Staff Filter */}
+              <div className="relative">
+                <button
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  className={`flex items-center gap-2 px-3 py-2 bg-surface-elevated border rounded-lg transition-colors ${
+                    !isAllSelected ? "border-primary text-primary" : "border-border text-gray-400 hover:border-primary/30"
+                  }`}
+                >
+                  <Filter size={16} />
+                  <span className="text-sm">
+                    {isAllSelected ? "All Staff" : `${selectedAgents.length} Selected`}
+                  </span>
+                  <ChevronDown size={16} className={`transition-transform ${filterOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Filter Dropdown */}
+                {filterOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-surface-elevated border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="p-3 border-b border-border flex items-center justify-between">
+                      <span className="text-sm font-medium text-white">Filter by Staff</span>
+                      <button
+                        onClick={selectAll}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        {isAllSelected ? "Clear All" : "Select All"}
+                      </button>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto p-2">
+                      {allAgents.map((agent) => (
+                        <button
+                          key={agent}
+                          onClick={() => toggleAgent(agent)}
+                          className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                            selectedAgents.includes(agent)
+                              ? "bg-surface hover:bg-surface/80"
+                              : "hover:bg-surface/50 opacity-50"
+                          }`}
+                        >
+                          <div className={`w-4 h-4 rounded-full ${agentColors[agent]}`} />
+                          <span className="text-sm text-white flex-1 text-left">{agent}</span>
+                          {selectedAgents.includes(agent) && (
+                            <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center">
+                              <X size={12} className="text-primary" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Month Navigation */}
               <button className="p-2 bg-surface-elevated border border-border rounded-lg hover:border-primary/30 transition-colors">
                 <ChevronLeft size={20} className="text-gray-400" />
               </button>
@@ -77,7 +153,7 @@ export default function Calendar() {
               <h2 className="font-semibold text-white">Always Running</h2>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              {alwaysRunning.map((agent) => (
+              {filteredAlwaysRunning.map((agent) => (
                 <div
                   key={agent.name}
                   className="p-4 bg-surface-elevated rounded-xl border border-primary/20 flex items-center gap-4"
@@ -105,7 +181,7 @@ export default function Calendar() {
               <h2 className="font-semibold text-white">Scheduled Automations</h2>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {cronJobs.map((job) => (
+              {filteredCronJobs.map((job) => (
                 <div
                   key={job.name}
                   className="p-3 bg-surface-elevated rounded-lg border border-border"
@@ -149,7 +225,7 @@ export default function Calendar() {
                       key={dayIndex}
                       className="h-16 border-r border-border last:border-r-0 relative"
                     >
-                      {events
+                      {filteredEvents
                         .filter((e) => e.day === dayIndex && e.hour === hour)
                         .map((event, i) => (
                           <div
