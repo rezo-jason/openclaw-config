@@ -103,45 +103,29 @@ function TaskCard({ task }) {
   const priority = priorityConfig[task.priority];
 
   return (
-    <div className="p-4 bg-surface-elevated rounded-lg border border-border hover:border-primary/30 transition-all cursor-pointer group">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-2">
-        <span className={`text-xs px-2 py-0.5 rounded ${priority.bg} ${priority.text} font-mono`}>
-          {priority.label}
-        </span>
-        {task.agent && (
-          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-            <Bot size={12} className="text-primary" />
-          </div>
-        )}
-      </div>
-
+    <div className="p-3 bg-surface-elevated rounded-lg border border-border hover:border-primary/30 transition-all cursor-pointer group">
       {/* Title */}
-      <h3 className="font-medium text-white text-sm mb-1 group-hover:text-primary transition-colors">
+      <h3 className="font-medium text-white text-sm mb-1 group-hover:text-primary transition-colors line-clamp-2">
         {task.title}
       </h3>
-      <p className="text-xs text-gray-500 mb-3">{task.project}</p>
+      <p className="text-xs text-gray-500 mb-2 truncate">{task.project}</p>
 
-      {/* Agent */}
+      {/* Agent Row */}
       {task.agent && (
-        <div className="flex items-center gap-2 mb-3 p-2 bg-background rounded">
-          <Bot size={14} className="text-primary" />
-          <span className="text-xs text-gray-400">{task.agent}</span>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Bot size={10} className="text-primary" />
+          </div>
+          <span className="text-xs text-gray-400 truncate">{task.agent}</span>
         </div>
       )}
 
-      {/* Progress */}
-      <div>
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-gray-500">Progress</span>
-          <span className="text-primary font-mono">{task.progress}%</span>
-        </div>
-        <div className="h-1.5 bg-background rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: `${task.progress}%` }}
-          />
-        </div>
+      {/* Footer: Priority + Progress */}
+      <div className="flex items-center justify-between">
+        <span className={`text-xs px-1.5 py-0.5 rounded ${priority.bg} ${priority.text}`}>
+          {priority.label}
+        </span>
+        <span className="text-xs text-primary font-mono">{task.progress}%</span>
       </div>
     </div>
   );
@@ -158,48 +142,36 @@ export default function Factory() {
             <p className="text-gray-500">Kanban view of all tasks in progress</p>
           </div>
 
-          {/* Stats Row */}
-          <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
-            {columns.map((col) => {
-              const count = tasks.filter((t) => t.column === col.id).length;
-              return (
-                <div key={col.id} className={`flex items-center gap-2 px-3 py-2 bg-surface-elevated rounded-lg border-l-2 ${col.color} border border-border shrink-0`}>
-                  <span className="text-xs text-gray-500">{col.name}</span>
-                  <span className="text-sm font-bold text-white">{count}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Vertical Pipeline Rows */}
-          <div className="space-y-4">
+          {/* Kanban Board - Horizontal Columns */}
+          <div className="flex gap-4 overflow-x-auto pb-4">
             {columns.map((column) => {
               const columnTasks = tasks.filter((task) => task.column === column.id);
               return (
-                <div key={column.id} className="bg-surface rounded-xl border border-border overflow-hidden">
-                  {/* Row Header */}
-                  <div className={`flex items-center gap-4 p-4 border-l-4 ${column.color} bg-surface-elevated`}>
-                    <div className="flex items-center gap-3 min-w-[140px]">
-                      <h3 className="font-semibold text-white">{column.name}</h3>
+                <div key={column.id} className="flex flex-col w-64 shrink-0">
+                  {/* Column Header */}
+                  <div className={`p-3 bg-surface-elevated rounded-t-lg border-t-2 ${column.color} border-x border-border`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-white text-sm">{column.name}</h3>
                       <span className="text-xs text-gray-500 font-mono bg-background px-2 py-0.5 rounded">
                         {columnTasks.length}
                       </span>
                     </div>
-                    
-                    {/* Task Cards Row */}
-                    <div className="flex-1 flex items-stretch gap-3 overflow-x-auto pb-1">
-                      {columnTasks.length === 0 ? (
-                        <div className="flex items-center justify-center py-2 px-4 text-gray-500 text-sm">
-                          No tasks
-                        </div>
-                      ) : (
-                        columnTasks.map((task) => (
-                          <div key={task.id} className="shrink-0 w-64">
-                            <TaskCard task={task} />
-                          </div>
-                        ))
-                      )}
-                    </div>
+                    <p className="text-xs text-gray-500">
+                      {columnTasks.length} {columnTasks.length === 1 ? "task" : "tasks"}
+                    </p>
+                  </div>
+
+                  {/* Task Cards - Stacked Vertically */}
+                  <div className="flex-1 bg-surface/50 rounded-b-lg border border-border border-t-0 p-2 space-y-2 min-h-[400px] max-h-[calc(100vh-280px)] overflow-y-auto">
+                    {columnTasks.length === 0 ? (
+                      <div className="flex items-center justify-center h-20 text-gray-500 text-sm">
+                        No tasks
+                      </div>
+                    ) : (
+                      columnTasks.map((task) => (
+                        <TaskCard key={task.id} task={task} />
+                      ))
+                    )}
                   </div>
                 </div>
               );
