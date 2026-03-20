@@ -82,49 +82,56 @@ function PipelineCard({ pipeline }) {
   const StatusIcon = status.icon;
 
   return (
-    <div className="p-4 bg-surface-elevated rounded-xl border border-border hover:border-primary/30 transition-all">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg ${status.bg} flex items-center justify-center`}>
+    <div className="bg-surface-elevated rounded-xl border border-border hover:border-primary/30 transition-all overflow-hidden">
+      {/* Vertical row layout - stage name on left, content flowing right */}
+      <div className={`flex items-center gap-4 p-4 border-l-4 ${
+        pipeline.status === 'success' ? 'border-green-500' :
+        pipeline.status === 'running' ? 'border-primary' :
+        pipeline.status === 'failed' ? 'border-red-500' : 'border-gray-500'
+      }`}>
+        {/* Left: Status Icon & Info */}
+        <div className="flex items-center gap-3 min-w-[200px] shrink-0">
+          <div className={`w-10 h-10 rounded-lg ${status.bg} flex items-center justify-center shrink-0`}>
             <StatusIcon size={20} className={status.color} />
           </div>
-          <div>
-            <h3 className="font-semibold text-white">{pipeline.name}</h3>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-white truncate">{pipeline.name}</h3>
             <div className="flex items-center gap-2 mt-1">
-              <GitBranch size={12} className="text-gray-500" />
-              <span className="text-xs text-gray-500 font-mono">{pipeline.branch}</span>
+              <GitBranch size={12} className="text-gray-500 shrink-0" />
+              <span className="text-xs text-gray-500 font-mono truncate">{pipeline.branch}</span>
             </div>
           </div>
         </div>
-        <span className={`text-xs px-2 py-1 rounded ${status.bg} ${status.color} font-mono capitalize`}>
-          {pipeline.status}
-        </span>
-      </div>
 
-      {/* Stages */}
-      <div className="flex items-center gap-2 mb-4">
-        {pipeline.stages.map((stage, index) => {
-          const stageStatus = statusConfig[stage.status];
-          const StageIcon = stageStatus.icon;
-          return (
-            <div key={stage.name} className="flex items-center flex-1">
-              <div className={`flex-1 p-2 rounded-lg ${stageStatus.bg} flex items-center justify-center gap-2`}>
-                <StageIcon size={14} className={stageStatus.color} />
-                <span className={`text-xs ${stageStatus.color}`}>{stage.name}</span>
+        {/* Middle: Stages flowing horizontally */}
+        <div className="flex-1 flex items-center gap-2 overflow-x-auto">
+          {pipeline.stages.map((stage, index) => {
+            const stageStatus = statusConfig[stage.status];
+            const StageIcon = stageStatus.icon;
+            return (
+              <div key={stage.name} className="flex items-center shrink-0">
+                <div className={`px-4 py-2 rounded-lg ${stageStatus.bg} flex items-center gap-2`}>
+                  <StageIcon size={14} className={stageStatus.color} />
+                  <span className={`text-xs font-medium ${stageStatus.color}`}>{stage.name}</span>
+                </div>
+                {index < pipeline.stages.length - 1 && (
+                  <div className="w-6 h-px bg-border mx-1" />
+                )}
               </div>
-              {index < pipeline.stages.length - 1 && (
-                <div className="w-4 h-px bg-border mx-1" />
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>{pipeline.lastRun}</span>
-        <span className="font-mono">{pipeline.duration}</span>
+        {/* Right: Status & Timing */}
+        <div className="flex items-center gap-4 shrink-0">
+          <div className="text-right">
+            <p className="text-xs text-gray-500">{pipeline.lastRun}</p>
+            <p className="text-xs text-gray-400 font-mono">{pipeline.duration}</p>
+          </div>
+          <span className={`text-xs px-2 py-1 rounded ${status.bg} ${status.color} font-mono capitalize`}>
+            {pipeline.status}
+          </span>
+        </div>
       </div>
     </div>
   );

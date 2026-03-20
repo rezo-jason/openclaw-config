@@ -158,43 +158,52 @@ export default function Factory() {
             <p className="text-gray-500">Kanban view of all tasks in progress</p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-5 gap-4 mb-6">
+          {/* Stats Row */}
+          <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
             {columns.map((col) => {
               const count = tasks.filter((t) => t.column === col.id).length;
               return (
-                <div key={col.id} className="bg-surface-elevated rounded-lg border border-border p-3">
-                  <p className="text-xs text-gray-500 mb-1">{col.name}</p>
-                  <p className="text-xl font-bold text-white">{count}</p>
+                <div key={col.id} className={`flex items-center gap-2 px-3 py-2 bg-surface-elevated rounded-lg border-l-2 ${col.color} border border-border shrink-0`}>
+                  <span className="text-xs text-gray-500">{col.name}</span>
+                  <span className="text-sm font-bold text-white">{count}</span>
                 </div>
               );
             })}
           </div>
 
-          {/* Kanban Board */}
-          <div className="grid grid-cols-5 gap-4">
-            {columns.map((column) => (
-              <div key={column.id} className="flex flex-col">
-                {/* Column Header */}
-                <div className={`p-3 bg-surface rounded-t-lg border-t-2 ${column.color} border-x border-border`}>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-white text-sm">{column.name}</h3>
-                    <span className="text-xs text-gray-500 font-mono">
-                      {tasks.filter((t) => t.column === column.id).length}
-                    </span>
+          {/* Vertical Pipeline Rows */}
+          <div className="space-y-4">
+            {columns.map((column) => {
+              const columnTasks = tasks.filter((task) => task.column === column.id);
+              return (
+                <div key={column.id} className="bg-surface rounded-xl border border-border overflow-hidden">
+                  {/* Row Header */}
+                  <div className={`flex items-center gap-4 p-4 border-l-4 ${column.color} bg-surface-elevated`}>
+                    <div className="flex items-center gap-3 min-w-[140px]">
+                      <h3 className="font-semibold text-white">{column.name}</h3>
+                      <span className="text-xs text-gray-500 font-mono bg-background px-2 py-0.5 rounded">
+                        {columnTasks.length}
+                      </span>
+                    </div>
+                    
+                    {/* Task Cards Row */}
+                    <div className="flex-1 flex items-stretch gap-3 overflow-x-auto pb-1">
+                      {columnTasks.length === 0 ? (
+                        <div className="flex items-center justify-center py-2 px-4 text-gray-500 text-sm">
+                          No tasks
+                        </div>
+                      ) : (
+                        columnTasks.map((task) => (
+                          <div key={task.id} className="shrink-0 w-64">
+                            <TaskCard task={task} />
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                {/* Tasks */}
-                <div className="flex-1 bg-surface/50 rounded-b-lg border border-border border-t-0 p-3 space-y-3 min-h-[400px]">
-                  {tasks
-                    .filter((task) => task.column === column.id)
-                    .map((task) => (
-                      <TaskCard key={task.id} task={task} />
-                    ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
