@@ -135,6 +135,17 @@ const allTasks = [
     dueDate: "Mar 23",
     createdAt: "4 days ago",
   },
+  {
+    id: 13,
+    title: "Mindfulness relaxation time (30m)",
+    project: "Personal",
+    agent: "Finance & Compliance",
+    status: "pending",
+    priority: "medium",
+    progress: 0,
+    dueDate: "Today 12:15 PM",
+    createdAt: "Just now",
+  },
 ];
 
 const priorityConfig = {
