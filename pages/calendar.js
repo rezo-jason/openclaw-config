@@ -34,6 +34,7 @@ const events = [
   { day: 4, hour: 11, agent: "QA Review", task: "Sprint Demo Prep", duration: 2 },
   { day: 4, hour: 15, agent: "Data Analytics", task: "Weekly Metrics Report", duration: 2 },
   { day: 5, hour: 10, agent: "Execution/Compiler", task: "Backup & Maintenance", duration: 2 },
+  { day: 5, hour: 12, agent: "Finance & Compliance", task: "Mindfulness relaxation time", duration: 1 },
   { day: 6, hour: 2, agent: "Data Analytics", task: "Nightly Data Sync", duration: 1, recurring: true },
 ];
 
