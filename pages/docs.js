@@ -1,95 +1,116 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import { FileStack, FileText, FileImage, File, Download, Eye, X, Search, FolderOpen } from "lucide-react";
+import { FileText, FileImage, File, Download, Eye, X, Search, FolderOpen, FileCode } from "lucide-react";
 
-// Mock documents with various types
+// Helper to determine file type from extension
+function getFileType(filename) {
+  const ext = filename.split(".").pop()?.toLowerCase() || "";
+  if (["pdf"].includes(ext)) return "pdf";
+  if (["doc", "docx"].includes(ext)) return "doc";
+  if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) return "image";
+  if (["md", "markdown"].includes(ext)) return "markdown";
+  if (["txt"].includes(ext)) return "text";
+  return "other";
+}
+
+// Helper to get file extension for display
+function getFileExtension(filename) {
+  return filename.split(".").pop()?.toUpperCase() || "FILE";
+}
+
+// Mock documents - In production, these would come from your API/database
+// URLs should point to actual files in /public/documents/ folder
 const documents = [
   {
     id: 1,
-    name: "Company Handbook",
-    type: "pdf",
+    name: "Company Handbook.pdf",
     size: "2.4 MB",
     category: "Policies",
-    url: "/docs/company-handbook.pdf",
+    url: "/documents/company-handbook.pdf",
     updatedAt: "Mar 15, 2026",
   },
   {
     id: 2,
-    name: "Brand Guidelines",
-    type: "pdf",
+    name: "Brand Guidelines.pdf",
     size: "5.1 MB",
     category: "Design",
-    url: "/docs/brand-guidelines.pdf",
+    url: "/documents/brand-guidelines.pdf",
     updatedAt: "Mar 10, 2026",
   },
   {
     id: 3,
-    name: "Team Photo 2026",
-    type: "image",
+    name: "Team Photo 2026.jpg",
     size: "1.2 MB",
     category: "Media",
-    url: "https://picsum.photos/800/600",
+    url: "https://picsum.photos/seed/team/800/600",
     updatedAt: "Feb 28, 2026",
   },
   {
     id: 4,
-    name: "Project Proposal Template",
-    type: "doc",
+    name: "Project Proposal Template.docx",
     size: "156 KB",
     category: "Templates",
-    url: "/docs/project-proposal.docx",
+    url: "/documents/project-proposal.docx",
     updatedAt: "Mar 18, 2026",
   },
   {
     id: 5,
-    name: "Office Floor Plan",
-    type: "image",
+    name: "Office Floor Plan.png",
     size: "890 KB",
     category: "Operations",
-    url: "https://picsum.photos/1200/800",
+    url: "https://picsum.photos/seed/office/1200/800",
     updatedAt: "Jan 5, 2026",
   },
   {
     id: 6,
-    name: "API Documentation",
-    type: "pdf",
-    size: "3.7 MB",
+    name: "API Documentation.md",
+    size: "127 KB",
     category: "Technical",
-    url: "/docs/api-docs.pdf",
+    url: "/documents/api-docs.md",
     updatedAt: "Mar 20, 2026",
   },
   {
     id: 7,
-    name: "Meeting Notes Template",
-    type: "doc",
+    name: "Meeting Notes Template.docx",
     size: "45 KB",
     category: "Templates",
-    url: "/docs/meeting-notes.docx",
+    url: "/documents/meeting-notes.docx",
     updatedAt: "Mar 12, 2026",
   },
   {
     id: 8,
-    name: "Product Mockups",
-    type: "image",
+    name: "Product Mockups.png",
     size: "4.2 MB",
     category: "Design",
-    url: "https://picsum.photos/1000/700",
+    url: "https://picsum.photos/seed/mockups/1000/700",
     updatedAt: "Mar 19, 2026",
+  },
+  {
+    id: 9,
+    name: "README.md",
+    size: "8 KB",
+    category: "Technical",
+    url: "/documents/readme.md",
+    updatedAt: "Mar 21, 2026",
   },
 ];
 
 const fileTypeConfig = {
-  pdf: { icon: FileText, color: "text-red-400", bg: "bg-red-500/20" },
-  doc: { icon: FileText, color: "text-blue-400", bg: "bg-blue-500/20" },
-  image: { icon: FileImage, color: "text-green-400", bg: "bg-green-500/20" },
-  default: { icon: File, color: "text-gray-400", bg: "bg-gray-500/20" },
+  pdf: { icon: FileText, color: "text-red-400", bg: "bg-red-500/20", label: "PDF" },
+  doc: { icon: FileText, color: "text-blue-400", bg: "bg-blue-500/20", label: "Word" },
+  image: { icon: FileImage, color: "text-green-400", bg: "bg-green-500/20", label: "Image" },
+  markdown: { icon: FileCode, color: "text-purple-400", bg: "bg-purple-500/20", label: "Markdown" },
+  text: { icon: FileText, color: "text-yellow-400", bg: "bg-yellow-500/20", label: "Text" },
+  other: { icon: File, color: "text-gray-400", bg: "bg-gray-500/20", label: "File" },
 };
 
 const categories = ["All", ...new Set(documents.map((d) => d.category))];
 
 function DocumentCard({ doc, onView, onDownload }) {
-  const config = fileTypeConfig[doc.type] || fileTypeConfig.default;
+  const fileType = getFileType(doc.name);
+  const config = fileTypeConfig[fileType] || fileTypeConfig.other;
   const Icon = config.icon;
+  const extension = getFileExtension(doc.name);
 
   return (
     <div className="p-4 bg-surface-elevated rounded-xl border border-border hover:border-primary/30 transition-all group">
@@ -105,7 +126,7 @@ function DocumentCard({ doc, onView, onDownload }) {
             {doc.name}
           </h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="uppercase font-mono">{doc.type}</span>
+            <span className={`uppercase font-mono px-1.5 py-0.5 rounded ${config.bg} ${config.color}`}>{extension}</span>
             <span>-</span>
             <span>{doc.size}</span>
           </div>
@@ -137,10 +158,15 @@ function DocumentCard({ doc, onView, onDownload }) {
   );
 }
 
-function DocumentViewer({ doc, onClose }) {
+function DocumentViewer({ doc, onClose, onDownload }) {
   if (!doc) return null;
 
-  const config = fileTypeConfig[doc.type] || fileTypeConfig.default;
+  const fileType = getFileType(doc.name);
+  const config = fileTypeConfig[fileType] || fileTypeConfig.other;
+  const Icon = config.icon;
+  const extension = getFileExtension(doc.name);
+  const canPreviewInline = ["image"].includes(fileType);
+  const canOpenInNewTab = ["pdf", "image", "markdown", "text"].includes(fileType);
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
@@ -149,15 +175,11 @@ function DocumentViewer({ doc, onClose }) {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-lg ${config.bg} flex items-center justify-center`}>
-              {doc.type === "image" ? (
-                <FileImage size={20} className={config.color} />
-              ) : (
-                <FileText size={20} className={config.color} />
-              )}
+              <Icon size={20} className={config.color} />
             </div>
             <div>
               <h2 className="font-semibold text-white">{doc.name}</h2>
-              <p className="text-xs text-gray-500">{doc.size} - {doc.type.toUpperCase()}</p>
+              <p className="text-xs text-gray-500">{doc.size} - {extension}</p>
             </div>
           </div>
           <button
@@ -170,38 +192,61 @@ function DocumentViewer({ doc, onClose }) {
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-background">
-          {doc.type === "image" ? (
+          {fileType === "image" ? (
             <img
               src={doc.url}
               alt={doc.name}
               className="max-w-full max-h-full object-contain rounded-lg"
               crossOrigin="anonymous"
             />
-          ) : doc.type === "pdf" ? (
+          ) : fileType === "pdf" ? (
             <div className="text-center">
-              <FileText size={64} className="text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 mb-4">PDF Viewer</p>
-              <p className="text-sm text-gray-500 mb-4">
-                To view this PDF, click the button below to open in a new tab or download.
+              <FileText size={64} className="text-red-500/50 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2 font-medium">PDF Document</p>
+              <p className="text-sm text-gray-500 mb-6">
+                Click below to open this PDF in a new browser tab.
               </p>
-              <div className="flex items-center justify-center gap-3">
-                <a
-                  href={doc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors flex items-center gap-2"
-                >
-                  <Eye size={16} />
-                  Open in New Tab
-                </a>
-              </div>
+              <a
+                href={doc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors"
+              >
+                <Eye size={16} />
+                Open in New Tab
+              </a>
+            </div>
+          ) : fileType === "doc" ? (
+            <div className="text-center">
+              <FileText size={64} className="text-blue-500/50 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2 font-medium">Word Document</p>
+              <p className="text-sm text-gray-500 mb-6">
+                Word documents cannot be previewed in the browser. Download to view in Microsoft Word or Google Docs.
+              </p>
+            </div>
+          ) : fileType === "markdown" || fileType === "text" ? (
+            <div className="text-center">
+              <FileCode size={64} className="text-purple-500/50 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2 font-medium">{config.label} File</p>
+              <p className="text-sm text-gray-500 mb-6">
+                Click below to open this file in a new tab.
+              </p>
+              <a
+                href={doc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors"
+              >
+                <Eye size={16} />
+                Open in New Tab
+              </a>
             </div>
           ) : (
             <div className="text-center">
-              <File size={64} className="text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 mb-4">Document Preview</p>
-              <p className="text-sm text-gray-500 mb-4">
-                This file type cannot be previewed directly. Please download to view.
+              <File size={64} className="text-gray-500/50 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2 font-medium">File Preview Unavailable</p>
+              <p className="text-sm text-gray-500 mb-6">
+                This file type cannot be previewed. Please download to view.
               </p>
             </div>
           )}
@@ -209,14 +254,13 @@ function DocumentViewer({ doc, onClose }) {
 
         {/* Footer */}
         <div className="p-4 border-t border-border flex justify-end">
-          <a
-            href={doc.url}
-            download={doc.name}
+          <button
+            onClick={() => onDownload(doc)}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors flex items-center gap-2"
           >
             <Download size={16} />
-            Download
-          </a>
+            Download {extension}
+          </button>
         </div>
       </div>
     </div>
@@ -235,21 +279,31 @@ export default function Docs() {
   });
 
   const handleView = (doc) => {
-    console.log("[v0] Viewing document:", doc.name, doc.type);
     setViewingDoc(doc);
   };
 
-  const handleDownload = (doc) => {
-    console.log("[v0] Downloading document:", doc.name, doc.type);
-    // Create a temporary link element for download
-    const link = document.createElement("a");
-    link.href = doc.url;
-    link.download = doc.name;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async (doc) => {
+    try {
+      // For external URLs or same-origin files, fetch and create blob for proper download
+      const response = await fetch(doc.url);
+      if (!response.ok) throw new Error("Download failed");
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = doc.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      // Fallback: open in new tab if fetch fails (e.g., CORS issues)
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -295,22 +349,26 @@ export default function Docs() {
           </div>
 
           {/* Document Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
-              <p className="text-xs text-gray-500 mb-1">Total Documents</p>
+              <p className="text-xs text-gray-500 mb-1">Total</p>
               <p className="text-xl font-bold text-white">{documents.length}</p>
             </div>
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <p className="text-xs text-gray-500 mb-1">PDFs</p>
-              <p className="text-xl font-bold text-red-400">{documents.filter((d) => d.type === "pdf").length}</p>
+              <p className="text-xl font-bold text-red-400">{documents.filter((d) => getFileType(d.name) === "pdf").length}</p>
             </div>
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <p className="text-xs text-gray-500 mb-1">Images</p>
-              <p className="text-xl font-bold text-green-400">{documents.filter((d) => d.type === "image").length}</p>
+              <p className="text-xl font-bold text-green-400">{documents.filter((d) => getFileType(d.name) === "image").length}</p>
             </div>
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
-              <p className="text-xs text-gray-500 mb-1">Documents</p>
-              <p className="text-xl font-bold text-blue-400">{documents.filter((d) => d.type === "doc").length}</p>
+              <p className="text-xs text-gray-500 mb-1">Word Docs</p>
+              <p className="text-xl font-bold text-blue-400">{documents.filter((d) => getFileType(d.name) === "doc").length}</p>
+            </div>
+            <div className="bg-surface-elevated rounded-xl border border-border p-4">
+              <p className="text-xs text-gray-500 mb-1">Markdown</p>
+              <p className="text-xl font-bold text-purple-400">{documents.filter((d) => getFileType(d.name) === "markdown").length}</p>
             </div>
           </div>
 
@@ -339,7 +397,11 @@ export default function Docs() {
 
       {/* Document Viewer Modal */}
       {viewingDoc && (
-        <DocumentViewer doc={viewingDoc} onClose={() => setViewingDoc(null)} />
+        <DocumentViewer 
+          doc={viewingDoc} 
+          onClose={() => setViewingDoc(null)} 
+          onDownload={handleDownload}
+        />
       )}
     </Layout>
   );
