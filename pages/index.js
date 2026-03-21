@@ -137,6 +137,7 @@ const activities = [
 ];
 
 export default function Office() {
+  console.log("[v0] Office page rendering");
   const workingAgents = agents.filter((a) => a.status === "working").length;
   const busyAgents = agents.filter((a) => a.status === "busy").length;
   const idleAgents = agents.filter((a) => a.status === "idle").length;
