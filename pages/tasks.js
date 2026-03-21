@@ -146,6 +146,17 @@ const allTasks = [
     dueDate: "Today 12:15 PM",
     createdAt: "Just now",
   },
+  {
+    id: 14,
+    title: "Mindfulness break (15m)",
+    project: "Personal",
+    agent: "Marketing & Outreach",
+    status: "pending",
+    priority: "medium",
+    progress: 0,
+    dueDate: "Today 1:30 PM",
+    createdAt: "Just now",
+  },
 ];
 
 const priorityConfig = {
