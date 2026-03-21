@@ -2,11 +2,13 @@ import Layout from "@/components/Layout";
 import { Bot, AlertCircle, Clock, CheckCircle } from "lucide-react";
 
 const columns = [
-  { id: "backlog", name: "Backlog", color: "border-gray-500" },
-  { id: "build", name: "Build", color: "border-primary" },
-  { id: "qa", name: "QA", color: "border-yellow-500" },
-  { id: "review", name: "Review", color: "border-purple-500" },
-  { id: "ship", name: "Ship", color: "border-green-500" },
+  { id: "inbox", name: "Inbox", color: "border-[#6b7280]" },
+  { id: "assigned", name: "Assigned", color: "border-[#0099FF]" },
+  { id: "in-progress", name: "In Progress", color: "border-[#f97316]" },
+  { id: "review", name: "Review", color: "border-[#a855f7]" },
+  { id: "approval", name: "Approval", color: "border-[#eab308]" },
+  { id: "complete", name: "Complete", color: "border-[#22c55e]" },
+  { id: "recurring", name: "Recurring", color: "border-[#14b8a6]" },
 ];
 
 const tasks = [
@@ -16,7 +18,7 @@ const tasks = [
     project: "Marketing Suite",
     priority: "high",
     progress: 0,
-    column: "backlog",
+    column: "inbox",
     agent: null,
   },
   {
@@ -25,7 +27,7 @@ const tasks = [
     project: "Finance Tools",
     priority: "medium",
     progress: 0,
-    column: "backlog",
+    column: "inbox",
     agent: null,
   },
   {
@@ -34,7 +36,7 @@ const tasks = [
     project: "Client Portal",
     priority: "high",
     progress: 45,
-    column: "build",
+    column: "assigned",
     agent: "Execution/Compiler",
   },
   {
@@ -43,7 +45,7 @@ const tasks = [
     project: "Developer Tools",
     priority: "low",
     progress: 60,
-    column: "build",
+    column: "in-progress",
     agent: "Manis Doc Creator",
   },
   {
@@ -52,7 +54,7 @@ const tasks = [
     project: "Data Platform",
     priority: "medium",
     progress: 75,
-    column: "qa",
+    column: "review",
     agent: "QA Review",
   },
   {
@@ -61,7 +63,7 @@ const tasks = [
     project: "Sales Automation",
     priority: "high",
     progress: 85,
-    column: "review",
+    column: "approval",
     agent: "Main Coordinator",
   },
   {
@@ -70,7 +72,7 @@ const tasks = [
     project: "Marketing Suite",
     priority: "medium",
     progress: 95,
-    column: "review",
+    column: "approval",
     agent: "Marketing & Outreach",
   },
   {
@@ -79,7 +81,7 @@ const tasks = [
     project: "Client Portal",
     priority: "high",
     progress: 100,
-    column: "ship",
+    column: "complete",
     agent: null,
   },
   {
@@ -88,8 +90,17 @@ const tasks = [
     project: "Integrations",
     priority: "medium",
     progress: 100,
-    column: "ship",
+    column: "complete",
     agent: null,
+  },
+  {
+    id: 10,
+    title: "Weekly Report Generation",
+    project: "Analytics",
+    priority: "low",
+    progress: 100,
+    column: "recurring",
+    agent: "Data Analyst",
   },
 ];
 
