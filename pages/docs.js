@@ -1,14 +1,22 @@
 import Layout from '@/components/Layout';
-import { FileText, File, Folder } from 'lucide-react';
+import { FileText, File, Folder, Download, Eye } from 'lucide-react';
 
 const docs = [
   {
     title: "2026-03-21 Marketing Outreach Weekly Report",
-    path: "documents/reports/2026-03-21_Marketing-Outreach_Weekly-Report.md",
+    path: "/documents/reports/2026-03-21_Marketing-Outreach_Weekly-Report.md",
     created: "2026-03-21",
     folder: "reports",
     author: "Marketing & Outreach",
     type: "report"
+  },
+  {
+    title: "2026-03-21 Grimmond Constructions Proposal",
+    path: "/documents/proposals/2026-03-21_Grimmond_Constructions_Proposal.docx",
+    created: "2026-03-21",
+    folder: "proposals",
+    author: "Finance & Compliance",
+    type: "proposal"
   }
 ];
 
@@ -25,30 +33,39 @@ export default function Documents() {
           <div className="bg-surface rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-12 gap-4 p-4 bg-surface-elevated border-b border-border text-xs text-gray-500 font-mono">
               <div className="col-span-1">Type</div>
-              <div className="col-span-5">Name</div>
+              <div className="col-span-4">Name</div>
               <div className="col-span-2">Folder</div>
               <div className="col-span-2">Author</div>
-              <div className="col-span-2">Date</div>
+              <div className="col-span-1">Date</div>
+              <div className="col-span-2 text-right">Actions</div>
             </div>
 
             <div className="divide-y divide-border">
               {docs.map((doc, i) => (
-                <div key={i} className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors cursor-pointer">
+                <div key={i} className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors cursor-pointer items-center">
                   <div className="col-span-1 flex items-center">
                     <FileText size={16} className="text-primary" />
                   </div>
-                  <div className="col-span-5 flex items-center">
-                    <span className="text-sm text-white font-medium">{doc.title}</span>
+                  <div className="col-span-4 flex items-center">
+                    <span className="text-sm text-white font-medium truncate" title={doc.title}>{doc.title}</span>
                   </div>
                   <div className="col-span-2 flex items-center gap-2">
                     <Folder size={14} className="text-gray-500" />
-                    <span className="text-sm text-gray-400">{doc.folder}</span>
+                    <span className="text-sm text-gray-400 truncate">{doc.folder}</span>
                   </div>
                   <div className="col-span-2 flex items-center">
-                    <span className="text-xs text-gray-400 bg-surface-elevated border border-border px-2 py-1 rounded">{doc.author}</span>
+                    <span className="text-xs text-gray-400 bg-surface-elevated border border-border px-2 py-1 rounded truncate">{doc.author}</span>
                   </div>
-                  <div className="col-span-2 flex items-center">
+                  <div className="col-span-1 flex items-center">
                     <span className="text-xs text-gray-500 font-mono">{doc.created}</span>
+                  </div>
+                  <div className="col-span-2 flex items-center justify-end gap-2">
+                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-primary transition-colors" title="Preview">
+                      <Eye size={14} />
+                    </a>
+                    <a href={doc.path} download className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-green-400 transition-colors" title="Download">
+                      <Download size={14} />
+                    </a>
                   </div>
                 </div>
               ))}
