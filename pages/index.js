@@ -192,6 +192,10 @@ export default function Office() {
               <ActivityFeed activities={activities} />
             </div>
           </div>
+          
+          <div className="mt-8 text-center text-gray-500 text-sm pb-4">
+            Powered by Supercharged Tradies AI
+          </div>
         </div>
       </div>
     </Layout>
