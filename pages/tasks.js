@@ -157,6 +157,17 @@ const allTasks = [
     dueDate: "Today 1:30 PM",
     createdAt: "Just now",
   },
+  {
+    id: 15,
+    title: "Testing Mission Control",
+    project: "Mission Control Integration Test",
+    agent: "Main Coordinator",
+    status: "completed",
+    priority: "high",
+    progress: 100,
+    dueDate: "Today",
+    createdAt: "Just now",
+  },
 ];
 
 const priorityConfig = {

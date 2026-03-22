@@ -37,6 +37,7 @@ const events = [
   { day: 5, hour: 12, agent: "Finance & Compliance", task: "Mindfulness relaxation time", duration: 1 },
   { day: 5, hour: 13, agent: "Marketing & Outreach", task: "Mindfulness break (15m)", duration: 1 },
   { day: 6, hour: 2, agent: "Data Analytics", task: "Nightly Data Sync", duration: 1, recurring: true },
+  { day: 0, hour: 16, agent: "Execution/Compiler", task: "Relaxation Time", duration: 1 },
 ];
 
 const cronJobs = [
