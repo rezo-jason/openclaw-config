@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { FileText, FileImage, File, Download, Eye, X, Search, FolderOpen, FileCode } from "lucide-react";
+import { FileText, FileImage, File, Download, Eye, X, Search, FolderOpen, FileCode, Calendar, ChevronDown } from "lucide-react";
 
 // Helper to determine file type from extension
 function getFileType(filename) {
@@ -17,6 +17,28 @@ function getFileType(filename) {
 function getFileExtension(filename) {
   return filename.split(".").pop()?.toUpperCase() || "FILE";
 }
+
+// Helper to parse date string to Date object for comparison
+function parseDate(dateStr) {
+  const months = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+  };
+  const parts = dateStr.split(" ");
+  const month = months[parts[0]];
+  const day = parseInt(parts[1].replace(",", ""));
+  const year = parseInt(parts[2]);
+  return new Date(year, month, day);
+}
+
+// Date filter options
+const dateFilters = [
+  { id: "all", label: "All Time" },
+  { id: "today", label: "Today" },
+  { id: "week", label: "This Week" },
+  { id: "month", label: "This Month" },
+  { id: "quarter", label: "Last 3 Months" },
+];
 
 // Mock documents - In production, these would come from your API/database
 // URLs should point to actual files in /public/documents/ folder
@@ -270,13 +292,69 @@ function DocumentViewer({ doc, onClose, onDownload }) {
 export default function Docs() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("all");
   const [viewingDoc, setViewingDoc] = useState(null);
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const searchRef = useRef(null);
+  const dateDropdownRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchSuggestions(false);
+      }
+      if (dateDropdownRef.current && !dateDropdownRef.current.contains(event.target)) {
+        setShowDateDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Filter by date
+  const filterByDate = (doc) => {
+    if (selectedDateFilter === "all") return true;
+    
+    const docDate = parseDate(doc.updatedAt);
+    const now = new Date();
+    
+    switch (selectedDateFilter) {
+      case "today":
+        return docDate.toDateString() === now.toDateString();
+      case "week":
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return docDate >= weekAgo;
+      case "month":
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        return docDate >= monthAgo;
+      case "quarter":
+        const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+        return docDate >= quarterAgo;
+      default:
+        return true;
+    }
+  };
+
+  // Get search suggestions (documents starting with search term)
+  const searchSuggestions = search.length > 0
+    ? documents.filter((doc) => 
+        doc.name.toLowerCase().startsWith(search.toLowerCase())
+      ).slice(0, 5)
+    : [];
 
   const filteredDocs = documents.filter((doc) => {
     const matchesSearch = doc.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = selectedCategory === "All" || doc.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesDate = filterByDate(doc);
+    return matchesSearch && matchesCategory && matchesDate;
   });
+
+  const handleSelectSuggestion = (doc) => {
+    setSearch(doc.name);
+    setShowSearchSuggestions(false);
+  };
 
   const handleView = (doc) => {
     setViewingDoc(doc);
@@ -317,17 +395,92 @@ export default function Docs() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search documents..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-surface-elevated border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary/50"
-              />
+          <div className="flex flex-col gap-4 mb-6">
+            {/* Search Row */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Smart Search with Suggestions */}
+              <div className="relative flex-1" ref={searchRef}>
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Type to search documents..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setShowSearchSuggestions(e.target.value.length > 0);
+                  }}
+                  onFocus={() => search.length > 0 && setShowSearchSuggestions(true)}
+                  className="w-full pl-10 pr-4 py-3 bg-surface-elevated border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary/50"
+                />
+                
+                {/* Search Suggestions Dropdown */}
+                {showSearchSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-surface-elevated border border-border rounded-lg shadow-xl z-40 overflow-hidden">
+                    <div className="p-2 border-b border-border">
+                      <span className="text-xs text-gray-500">Quick suggestions</span>
+                    </div>
+                    {searchSuggestions.map((doc) => {
+                      const fileType = getFileType(doc.name);
+                      const config = fileTypeConfig[fileType] || fileTypeConfig.other;
+                      const Icon = config.icon;
+                      return (
+                        <button
+                          key={doc.id}
+                          onClick={() => handleSelectSuggestion(doc)}
+                          className="w-full flex items-center gap-3 p-3 hover:bg-surface transition-colors text-left"
+                        >
+                          <div className={`w-8 h-8 rounded-lg ${config.bg} flex items-center justify-center shrink-0`}>
+                            <Icon size={16} className={config.color} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-white truncate">{doc.name}</p>
+                            <p className="text-xs text-gray-500">{doc.category} - {doc.size}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Date Filter Dropdown */}
+              <div className="relative" ref={dateDropdownRef}>
+                <button
+                  onClick={() => setShowDateDropdown(!showDateDropdown)}
+                  className={`flex items-center gap-2 px-4 py-3 bg-surface-elevated border rounded-lg transition-colors min-w-[160px] ${
+                    selectedDateFilter !== "all" 
+                      ? "border-primary text-primary" 
+                      : "border-border text-gray-400 hover:border-primary/30"
+                  }`}
+                >
+                  <Calendar size={18} />
+                  <span className="text-sm flex-1 text-left">
+                    {dateFilters.find((f) => f.id === selectedDateFilter)?.label}
+                  </span>
+                  <ChevronDown size={16} className={`transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
+                </button>
+
+                {showDateDropdown && (
+                  <div className="absolute top-full right-0 mt-1 w-48 bg-surface-elevated border border-border rounded-lg shadow-xl z-40 overflow-hidden">
+                    {dateFilters.map((filter) => (
+                      <button
+                        key={filter.id}
+                        onClick={() => {
+                          setSelectedDateFilter(filter.id);
+                          setShowDateDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                          selectedDateFilter === filter.id
+                            ? "bg-primary/20 text-primary"
+                            : "text-gray-400 hover:bg-surface"
+                        }`}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Category Filter */}
