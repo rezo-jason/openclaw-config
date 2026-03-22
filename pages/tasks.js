@@ -168,6 +168,17 @@ const allTasks = [
     dueDate: "Today",
     createdAt: "Just now",
   },
+  {
+    id: 16,
+    title: "Test Task — Gmail Integration Setup",
+    project: "System Setup",
+    agent: "Execution/Compiler",
+    status: "active",
+    priority: "high",
+    progress: 50,
+    dueDate: "Today",
+    createdAt: "Just now",
+  },
 ];
 
 const priorityConfig = {
