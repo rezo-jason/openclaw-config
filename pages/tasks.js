@@ -179,6 +179,17 @@ const allTasks = [
     dueDate: "Today",
     createdAt: "Just now",
   },
+  {
+    id: 17,
+    title: "Gmail Integration Setup",
+    project: "System Setup",
+    agent: "Execution/Compiler",
+    status: "active",
+    priority: "high",
+    progress: 50,
+    dueDate: "Today",
+    createdAt: "Just now",
+  },
 ];
 
 const priorityConfig = {
