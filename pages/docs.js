@@ -113,6 +113,42 @@ const initialDocs = [
     type: "pdf",
     filename: "weekly-analytics.pdf"
   },
+  {
+    title: "Program 1 — Start Your Trade Business Mastermind (v3)",
+    path: "/documents/PROGRAM1_START_YOUR_TRADE_BUSINESS_MASTERMIND_BRANDED_v3.pdf",
+    created: "2026-03-23",
+    folder: "proposals",
+    author: "Manus Doc Creator",
+    type: "pdf",
+    filename: "PROGRAM1_START_YOUR_TRADE_BUSINESS_MASTERMIND_BRANDED_v3.pdf"
+  },
+  {
+    title: "Program 2 — From Tradie to Business Owner (v3)",
+    path: "/documents/PROGRAM2_FROM_TRADIE_TO_BUSINESS_OWNER_BRANDED_v3.pdf",
+    created: "2026-03-23",
+    folder: "proposals",
+    author: "Manus Doc Creator",
+    type: "pdf",
+    filename: "PROGRAM2_FROM_TRADIE_TO_BUSINESS_OWNER_BRANDED_v3.pdf"
+  },
+  {
+    title: "Grimmond Proposal Branded v2",
+    path: "/documents/GRIMMOND_PROPOSAL_BRANDED_v2.pdf",
+    created: "2026-03-23",
+    folder: "proposals",
+    author: "Manus Doc Creator",
+    type: "pdf",
+    filename: "GRIMMOND_PROPOSAL_BRANDED_v2.pdf"
+  },
+  {
+    title: "Supercharged Tradies Cover Test",
+    path: "/documents/SUPERCHARGED_TRADIES_COVER_TEST.pdf",
+    created: "2026-03-23",
+    folder: "marketing",
+    author: "Manus Doc Creator",
+    type: "pdf",
+    filename: "SUPERCHARGED_TRADIES_COVER_TEST.pdf"
+  },
 ];
 
 export default function Documents() {
