@@ -1,5 +1,6 @@
 import Layout from "@/components/Layout";
-import { Bot, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { Bot, Clock, RefreshCw, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 
 const agentColors = {
   "Main Coordinator": "bg-blue-500",
@@ -50,7 +51,27 @@ const cronJobs = [
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 
+const allAgents = Object.keys(agentColors);
+
 export default function Calendar() {
+  const [selectedAgents, setSelectedAgents] = useState(allAgents);
+
+  const toggleAgent = (agent) => {
+    if (selectedAgents.includes(agent)) {
+      if (selectedAgents.length === 1) return; // Keep at least one selected
+      setSelectedAgents(selectedAgents.filter((a) => a !== agent));
+    } else {
+      setSelectedAgents([...selectedAgents, agent]);
+    }
+  };
+
+  const selectAll = () => setSelectedAgents(allAgents);
+  const clearAll = () => setSelectedAgents([allAgents[0]]);
+
+  const filteredEvents = events.filter((e) => selectedAgents.includes(e.agent));
+  const filteredAlwaysRunning = alwaysRunning.filter((a) => selectedAgents.includes(a.name));
+  const filteredCronJobs = cronJobs.filter((j) => selectedAgents.includes(j.agent));
+
   return (
     <Layout title="Calendar">
       <div className="grid-floor min-h-screen">
@@ -74,6 +95,49 @@ export default function Calendar() {
             </div>
           </div>
 
+          {/* Staff Filter */}
+          <div className="mb-6 p-4 bg-surface rounded-xl border border-border">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Filter size={16} className="text-primary" />
+                <h2 className="font-semibold text-white text-sm">Filter by Agent</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={selectAll}
+                  className="text-xs px-2 py-1 bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors"
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={clearAll}
+                  className="text-xs px-2 py-1 bg-surface-elevated text-gray-400 rounded hover:bg-surface-elevated/80 transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {allAgents.map((agent) => {
+                const isSelected = selectedAgents.includes(agent);
+                return (
+                  <button
+                    key={agent}
+                    onClick={() => toggleAgent(agent)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${
+                      isSelected
+                        ? "bg-surface-elevated border-primary/50 text-white"
+                        : "bg-surface border-border text-gray-500 opacity-50 hover:opacity-75"
+                    }`}
+                  >
+                    <div className={`w-3 h-3 rounded-full ${agentColors[agent]}`} />
+                    <span className="text-xs font-medium">{agent}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Always Running Section */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
@@ -81,7 +145,7 @@ export default function Calendar() {
               <h2 className="font-semibold text-white">Always Running</h2>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              {alwaysRunning.map((agent) => (
+              {filteredAlwaysRunning.map((agent) => (
                 <div
                   key={agent.name}
                   className="p-4 bg-surface-elevated rounded-xl border border-primary/20 flex items-center gap-4"
@@ -109,7 +173,7 @@ export default function Calendar() {
               <h2 className="font-semibold text-white">Scheduled Automations</h2>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {cronJobs.map((job) => (
+              {filteredCronJobs.map((job) => (
                 <div
                   key={job.name}
                   className="p-3 bg-surface-elevated rounded-lg border border-border"
@@ -153,7 +217,7 @@ export default function Calendar() {
                       key={dayIndex}
                       className="h-16 border-r border-border last:border-r-0 relative"
                     >
-                      {events
+                      {filteredEvents
                         .filter((e) => e.day === dayIndex && e.hour === hour)
                         .map((event, i) => (
                           <div

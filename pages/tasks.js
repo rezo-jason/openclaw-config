@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import { Bot, Filter, Search, Clock, CheckCircle, AlertCircle, Play, Pause } from "lucide-react";
+import { Bot, Filter, Search, Clock, CheckCircle, AlertCircle, Play, Pause, Trash2 } from "lucide-react";
 
 const allTasks = [
   {
@@ -133,12 +133,17 @@ const projects = [
 const statuses = ["All Status", "Active", "Pending", "Completed"];
 
 export default function Tasks() {
+  const [tasks, setTasks] = useState(allTasks);
   const [search, setSearch] = useState("");
   const [agentFilter, setAgentFilter] = useState("All Agents");
   const [projectFilter, setProjectFilter] = useState("All Projects");
   const [statusFilter, setStatusFilter] = useState("All Status");
 
-  const filteredTasks = allTasks.filter((task) => {
+  const deleteTask = (taskId) => {
+    setTasks(tasks.filter((t) => t.id !== taskId));
+  };
+
+  const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
       task.title.toLowerCase().includes(search.toLowerCase()) ||
       task.project.toLowerCase().includes(search.toLowerCase());
@@ -150,9 +155,9 @@ export default function Tasks() {
     return matchesSearch && matchesAgent && matchesProject && matchesStatus;
   });
 
-  const activeCount = allTasks.filter((t) => t.status === "active").length;
-  const pendingCount = allTasks.filter((t) => t.status === "pending").length;
-  const completedCount = allTasks.filter((t) => t.status === "completed").length;
+  const activeCount = tasks.filter((t) => t.status === "active").length;
+  const pendingCount = tasks.filter((t) => t.status === "pending").length;
+  const completedCount = tasks.filter((t) => t.status === "completed").length;
 
   return (
     <Layout title="Tasks">
@@ -168,7 +173,7 @@ export default function Tasks() {
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <p className="text-xs text-gray-500 mb-2">Total Tasks</p>
-              <p className="text-2xl font-bold text-white">{allTasks.length}</p>
+              <p className="text-2xl font-bold text-white">{tasks.length}</p>
             </div>
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -251,12 +256,13 @@ export default function Tasks() {
           <div className="bg-surface rounded-xl border border-border overflow-hidden">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 p-4 bg-surface-elevated border-b border-border text-xs text-gray-500 font-mono">
-              <div className="col-span-4">Task</div>
+              <div className="col-span-3">Task</div>
               <div className="col-span-2">Agent</div>
               <div className="col-span-2">Project</div>
               <div className="col-span-1">Priority</div>
               <div className="col-span-1">Status</div>
               <div className="col-span-2">Progress</div>
+              <div className="col-span-1 text-right">Actions</div>
             </div>
 
             {/* Tasks */}
@@ -269,10 +275,10 @@ export default function Tasks() {
                 return (
                   <div
                     key={task.id}
-                    className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors cursor-pointer"
+                    className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors"
                   >
                     {/* Task */}
-                    <div className="col-span-4">
+                    <div className="col-span-3">
                       <p className="font-medium text-white mb-1">{task.title}</p>
                       <p className="text-xs text-gray-500">Due: {task.dueDate}</p>
                     </div>
@@ -314,6 +320,17 @@ export default function Tasks() {
                         />
                       </div>
                       <span className="text-xs text-primary font-mono w-10 text-right">{task.progress}%</span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="col-span-1 flex items-center justify-end">
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="Delete task"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </div>
                 );
