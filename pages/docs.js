@@ -1,65 +1,120 @@
 import Layout from '@/components/Layout';
 import { useState, useMemo } from 'react';
 import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X } from 'lucide-react';
-import fs from 'fs';
-import path from 'path';
 
-export async function getStaticProps() {
-  const docsDir = path.join(process.cwd(), 'documents');
-  const docs = [];
-  const folders = ['reports','proposals','quotes','contracts','finance','marketing','meeting-notes','research','templates'];
+// Sample documents data (replacing filesystem-based loading)
+const initialDocs = [
+  {
+    title: "Q1 Marketing Report",
+    path: "/documents/reports/q1-marketing-report.pdf",
+    created: "2026-03-20",
+    folder: "reports",
+    author: "Marketing & Outreach",
+    type: "pdf",
+    filename: "q1-marketing-report.pdf"
+  },
+  {
+    title: "Project Proposal Grimmond",
+    path: "/documents/proposals/grimmond-proposal.pdf",
+    created: "2026-03-18",
+    folder: "proposals",
+    author: "Manis Doc Creator",
+    type: "pdf",
+    filename: "grimmond-proposal.pdf"
+  },
+  {
+    title: "Client Quote Template",
+    path: "/documents/quotes/client-quote-template.docx",
+    created: "2026-03-15",
+    folder: "quotes",
+    author: "Finance & Compliance",
+    type: "docx",
+    filename: "client-quote-template.docx"
+  },
+  {
+    title: "Service Agreement v2",
+    path: "/documents/contracts/service-agreement-v2.pdf",
+    created: "2026-03-12",
+    folder: "contracts",
+    author: "Main Coordinator",
+    type: "pdf",
+    filename: "service-agreement-v2.pdf"
+  },
+  {
+    title: "Monthly Budget Analysis",
+    path: "/documents/finance/monthly-budget-2026.xlsx",
+    created: "2026-03-10",
+    folder: "finance",
+    author: "Finance & Compliance",
+    type: "xlsx",
+    filename: "monthly-budget-2026.xlsx"
+  },
+  {
+    title: "Social Media Guidelines",
+    path: "/documents/marketing/social-media-guidelines.md",
+    created: "2026-03-08",
+    folder: "marketing",
+    author: "Marketing & Outreach",
+    type: "md",
+    filename: "social-media-guidelines.md"
+  },
+  {
+    title: "Team Standup Notes March",
+    path: "/documents/meeting-notes/standup-march-2026.md",
+    created: "2026-03-22",
+    folder: "meeting-notes",
+    author: "Main Coordinator",
+    type: "md",
+    filename: "standup-march-2026.md"
+  },
+  {
+    title: "Market Research Q1",
+    path: "/documents/research/market-research-q1.pdf",
+    created: "2026-03-05",
+    folder: "research",
+    author: "Memory/Research",
+    type: "pdf",
+    filename: "market-research-q1.pdf"
+  },
+  {
+    title: "Invoice Template",
+    path: "/documents/templates/invoice-template.docx",
+    created: "2026-02-28",
+    folder: "templates",
+    author: "Finance & Compliance",
+    type: "docx",
+    filename: "invoice-template.docx"
+  },
+  {
+    title: "API Documentation",
+    path: "/documents/reports/api-docs-v3.md",
+    created: "2026-03-19",
+    folder: "reports",
+    author: "Execution/Compiler",
+    type: "md",
+    filename: "api-docs-v3.md"
+  },
+  {
+    title: "Client Onboarding Guide",
+    path: "/documents/templates/onboarding-guide.pdf",
+    created: "2026-03-14",
+    folder: "templates",
+    author: "Manis Doc Creator",
+    type: "pdf",
+    filename: "onboarding-guide.pdf"
+  },
+  {
+    title: "Weekly Analytics Report",
+    path: "/documents/reports/weekly-analytics.pdf",
+    created: "2026-03-21",
+    folder: "reports",
+    author: "Data Analytics",
+    type: "pdf",
+    filename: "weekly-analytics.pdf"
+  },
+];
 
-  // Also check root documents folder
-  const rootFiles = fs.readdirSync(docsDir).filter(f =>
-    fs.statSync(path.join(docsDir, f)).isFile()
-  );
-
-  rootFiles.forEach(file => {
-    const stats = fs.statSync(path.join(docsDir, file));
-    docs.push({
-      title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
-      path: `/documents/${file}`,
-      rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${file}`,
-      created: stats.mtime.toISOString().split('T')[0],
-      folder: 'root',
-      author: 'Agent',
-      type: file.split('.').pop(),
-      filename: file
-    });
-  });
-
-  folders.forEach(folder => {
-    const folderPath = path.join(docsDir, folder);
-    if (!fs.existsSync(folderPath)) return;
-    const files = fs.readdirSync(folderPath).filter(f =>
-      fs.statSync(path.join(folderPath, f)).isFile()
-    );
-    files.forEach(file => {
-      const stats = fs.statSync(path.join(folderPath, file));
-      const parts = file.replace(/\.[^.]+$/, '').split('_');
-      // Try to extract date from filename (YYYY-MM-DD format)
-      const dateMatch = file.match(/^(\d{4}-\d{2}-\d{2})/);
-      const created = dateMatch ? dateMatch[1] : stats.mtime.toISOString().split('T')[0];
-      docs.push({
-        title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
-        path: `/documents/${folder}/${file}`,
-        rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${folder}/${file}`,
-        created: created,
-        folder: folder,
-        author: parts[1] || 'Agent',
-        type: file.split('.').pop(),
-        filename: file
-      });
-    });
-  });
-
-  // Sort by date descending
-  docs.sort((a, b) => new Date(b.created) - new Date(a.created));
-
-  return { props: { initialDocs: docs } };
-}
-
-export default function Documents({ initialDocs }) {
+export default function Documents() {
   const [docs, setDocs] = useState(initialDocs);
   const [search, setSearch] = useState('');
   const [folderFilter, setFolderFilter] = useState('All Folders');
@@ -71,12 +126,12 @@ export default function Documents({ initialDocs }) {
   const folders = useMemo(() => {
     const unique = [...new Set(initialDocs.map(d => d.folder))];
     return ['All Folders', ...unique.sort()];
-  }, [initialDocs]);
+  }, []);
 
   const types = useMemo(() => {
     const unique = [...new Set(initialDocs.map(d => d.type))];
     return ['All Types', ...unique.sort()];
-  }, [initialDocs]);
+  }, []);
 
   // Smart search - searches across title, folder, author, type
   const filteredDocs = useMemo(() => {
@@ -225,7 +280,7 @@ export default function Documents({ initialDocs }) {
                   <div className="col-span-1">
                     <div className={`inline-flex items-center justify-center w-8 h-8 rounded ${
                       doc.type === 'pdf' ? 'bg-red-500/20 text-red-400' :
-                      doc.type === 'docx' ? 'bg-blue-500/20 text-blue-400' :
+                      doc.type === 'docx' || doc.type === 'xlsx' ? 'bg-blue-500/20 text-blue-400' :
                       doc.type === 'md' ? 'bg-purple-500/20 text-purple-400' :
                       'bg-primary/20 text-primary'
                     }`}>
@@ -247,12 +302,12 @@ export default function Documents({ initialDocs }) {
                     <span className="text-xs text-gray-500 font-mono">{doc.created}</span>
                   </div>
                   <div className="col-span-2 flex items-center justify-end gap-2">
-                    <a href={doc.rawUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-primary transition-colors" title="Preview">
+                    <button className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-primary transition-colors" title="Preview">
                       <Eye size={14} />
-                    </a>
-                    <a href={doc.rawUrl} download className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-green-400 transition-colors" title="Download">
+                    </button>
+                    <button className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-green-400 transition-colors" title="Download">
                       <Download size={14} />
-                    </a>
+                    </button>
                     <button 
                       onClick={() => deleteDoc(doc.path)}
                       className="p-1.5 bg-surface border border-border rounded hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors" 
