@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import { Bot, Filter, Search, Clock, CheckCircle, AlertCircle, Play, Pause } from "lucide-react";
+import { Bot, Filter, Search, Clock, CheckCircle, AlertCircle, Play, Pause, Trash2, AlertTriangle, X } from "lucide-react";
 
 const allTasks = [
   {
@@ -176,13 +176,70 @@ const projects = [
 
 const statuses = ["All Status", "Active", "Pending", "Completed"];
 
+function DeleteConfirmModal({ task, onConfirm, onCancel }) {
+  if (!task) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+      <div className="bg-surface rounded-xl border border-border w-full max-w-md overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+              <AlertTriangle size={24} className="text-red-400" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-white text-lg">Delete Task</h2>
+              <p className="text-sm text-gray-500">This action cannot be undone</p>
+            </div>
+          </div>
+          
+          <p className="text-gray-400 mb-6">
+            Are you sure you want to delete <span className="text-white font-medium">"{task.title}"</span>?
+          </p>
+
+          <div className="flex items-center gap-3 justify-end">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-surface-elevated border border-border rounded-lg text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onConfirm(task)}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Tasks() {
+  const [tasks, setTasks] = useState(allTasks);
   const [search, setSearch] = useState("");
   const [agentFilter, setAgentFilter] = useState("All Agents");
   const [projectFilter, setProjectFilter] = useState("All Projects");
   const [statusFilter, setStatusFilter] = useState("All Status");
+  const [deletingTask, setDeletingTask] = useState(null);
 
-  const filteredTasks = allTasks.filter((task) => {
+  const handleDeleteClick = (task) => {
+    setDeletingTask(task);
+  };
+
+  const handleDeleteConfirm = (task) => {
+    setTasks(tasks.filter((t) => t.id !== task.id));
+    setDeletingTask(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingTask(null);
+  };
+
+  const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
       task.title.toLowerCase().includes(search.toLowerCase()) ||
       task.project.toLowerCase().includes(search.toLowerCase());
@@ -194,9 +251,9 @@ export default function Tasks() {
     return matchesSearch && matchesAgent && matchesProject && matchesStatus;
   });
 
-  const activeCount = allTasks.filter((t) => t.status === "active").length;
-  const pendingCount = allTasks.filter((t) => t.status === "pending").length;
-  const completedCount = allTasks.filter((t) => t.status === "completed").length;
+  const activeCount = tasks.filter((t) => t.status === "active").length;
+  const pendingCount = tasks.filter((t) => t.status === "pending").length;
+  const completedCount = tasks.filter((t) => t.status === "completed").length;
 
   return (
     <Layout title="Tasks">
@@ -212,7 +269,7 @@ export default function Tasks() {
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <p className="text-xs text-gray-500 mb-2">Total Tasks</p>
-              <p className="text-2xl font-bold text-white">{allTasks.length}</p>
+              <p className="text-2xl font-bold text-white">{tasks.length}</p>
             </div>
             <div className="bg-surface-elevated rounded-xl border border-border p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -295,12 +352,13 @@ export default function Tasks() {
           <div className="bg-surface rounded-xl border border-border overflow-hidden">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 p-4 bg-surface-elevated border-b border-border text-xs text-gray-500 font-mono">
-              <div className="col-span-4">Task</div>
+              <div className="col-span-3">Task</div>
               <div className="col-span-2">Agent</div>
               <div className="col-span-2">Project</div>
               <div className="col-span-1">Priority</div>
               <div className="col-span-1">Status</div>
               <div className="col-span-2">Progress</div>
+              <div className="col-span-1 text-right">Action</div>
             </div>
 
             {/* Tasks */}
@@ -313,17 +371,17 @@ export default function Tasks() {
                 return (
                   <div
                     key={task.id}
-                    className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors cursor-pointer"
+                    className="grid grid-cols-12 gap-4 p-4 hover:bg-surface-elevated/50 transition-colors group"
                   >
                     {/* Task */}
-                    <div className="col-span-4">
-                      <p className="font-medium text-white mb-1">{task.title}</p>
+                    <div className="col-span-3">
+                      <p className="font-medium text-white mb-1 truncate">{task.title}</p>
                       <p className="text-xs text-gray-500">Due: {task.dueDate}</p>
                     </div>
 
                     {/* Agent */}
                     <div className="col-span-2 flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                         <Bot size={12} className="text-primary" />
                       </div>
                       <span className="text-sm text-gray-300 truncate">{task.agent}</span>
@@ -331,7 +389,7 @@ export default function Tasks() {
 
                     {/* Project */}
                     <div className="col-span-2 flex items-center">
-                      <span className="text-sm text-gray-400">{task.project}</span>
+                      <span className="text-sm text-gray-400 truncate">{task.project}</span>
                     </div>
 
                     {/* Priority */}
@@ -359,6 +417,17 @@ export default function Tasks() {
                       </div>
                       <span className="text-xs text-primary font-mono w-10 text-right">{task.progress}%</span>
                     </div>
+
+                    {/* Delete Action */}
+                    <div className="col-span-1 flex items-center justify-end">
+                      <button
+                        onClick={() => handleDeleteClick(task)}
+                        className="p-2 rounded-lg border border-transparent hover:border-red-500/50 hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Delete task"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -373,6 +442,15 @@ export default function Tasks() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deletingTask && (
+        <DeleteConfirmModal
+          task={deletingTask}
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
+        />
+      )}
     </Layout>
   );
 }
