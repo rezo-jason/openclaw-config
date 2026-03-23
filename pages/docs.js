@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { FileText, FileImage, File, Download, Eye, X, Search, FolderOpen, FileCode, Calendar, ChevronDown } from "lucide-react";
+import { FileText, FileImage, File, Download, Eye, X, Search, FolderOpen, FileCode, Calendar, ChevronDown, Trash2, AlertTriangle } from "lucide-react";
 
 // Helper to determine file type from extension
 function getFileType(filename) {
@@ -40,83 +40,6 @@ const dateFilters = [
   { id: "quarter", label: "Last 3 Months" },
 ];
 
-// Mock documents - In production, these would come from your API/database
-// URLs should point to actual files in /public/documents/ folder
-const documents = [
-  {
-    id: 1,
-    name: "Company Handbook.pdf",
-    size: "2.4 MB",
-    category: "Policies",
-    url: "/documents/company-handbook.pdf",
-    updatedAt: "Mar 15, 2026",
-  },
-  {
-    id: 2,
-    name: "Brand Guidelines.pdf",
-    size: "5.1 MB",
-    category: "Design",
-    url: "/documents/brand-guidelines.pdf",
-    updatedAt: "Mar 10, 2026",
-  },
-  {
-    id: 3,
-    name: "Team Photo 2026.jpg",
-    size: "1.2 MB",
-    category: "Media",
-    url: "https://picsum.photos/seed/team/800/600",
-    updatedAt: "Feb 28, 2026",
-  },
-  {
-    id: 4,
-    name: "Project Proposal Template.docx",
-    size: "156 KB",
-    category: "Templates",
-    url: "/documents/project-proposal.docx",
-    updatedAt: "Mar 18, 2026",
-  },
-  {
-    id: 5,
-    name: "Office Floor Plan.png",
-    size: "890 KB",
-    category: "Operations",
-    url: "https://picsum.photos/seed/office/1200/800",
-    updatedAt: "Jan 5, 2026",
-  },
-  {
-    id: 6,
-    name: "API Documentation.md",
-    size: "127 KB",
-    category: "Technical",
-    url: "/documents/api-docs.md",
-    updatedAt: "Mar 20, 2026",
-  },
-  {
-    id: 7,
-    name: "Meeting Notes Template.docx",
-    size: "45 KB",
-    category: "Templates",
-    url: "/documents/meeting-notes.docx",
-    updatedAt: "Mar 12, 2026",
-  },
-  {
-    id: 8,
-    name: "Product Mockups.png",
-    size: "4.2 MB",
-    category: "Design",
-    url: "https://picsum.photos/seed/mockups/1000/700",
-    updatedAt: "Mar 19, 2026",
-  },
-  {
-    id: 9,
-    name: "README.md",
-    size: "8 KB",
-    category: "Technical",
-    url: "/documents/readme.md",
-    updatedAt: "Mar 21, 2026",
-  },
-];
-
 const fileTypeConfig = {
   pdf: { icon: FileText, color: "text-red-400", bg: "bg-red-500/20", label: "PDF" },
   doc: { icon: FileText, color: "text-blue-400", bg: "bg-blue-500/20", label: "Word" },
@@ -126,9 +49,7 @@ const fileTypeConfig = {
   other: { icon: File, color: "text-gray-400", bg: "bg-gray-500/20", label: "File" },
 };
 
-const categories = ["All", ...new Set(documents.map((d) => d.category))];
-
-function DocumentCard({ doc, onView, onDownload }) {
+function DocumentCard({ doc, onView, onDownload, onDelete }) {
   const fileType = getFileType(doc.name);
   const config = fileTypeConfig[fileType] || fileTypeConfig.other;
   const Icon = config.icon;
@@ -174,6 +95,55 @@ function DocumentCard({ doc, onView, onDownload }) {
           >
             <Download size={16} />
           </button>
+          <button
+            onClick={() => onDelete(doc)}
+            className="p-2 bg-surface border border-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-colors text-gray-400"
+            title="Delete"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteConfirmModal({ doc, onConfirm, onCancel }) {
+  if (!doc) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+      <div className="bg-surface rounded-xl border border-border w-full max-w-md overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+              <AlertTriangle size={24} className="text-red-400" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-white text-lg">Delete Document</h2>
+              <p className="text-sm text-gray-500">This action cannot be undone</p>
+            </div>
+          </div>
+          
+          <p className="text-gray-400 mb-6">
+            Are you sure you want to delete <span className="text-white font-medium">{doc.name}</span>?
+          </p>
+
+          <div className="flex items-center gap-3 justify-end">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-surface-elevated border border-border rounded-lg text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onConfirm(doc)}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -289,15 +259,96 @@ function DocumentViewer({ doc, onClose, onDownload }) {
   );
 }
 
+// Initial documents data
+const initialDocuments = [
+  {
+    id: 1,
+    name: "Company Handbook.pdf",
+    size: "2.4 MB",
+    category: "Policies",
+    url: "/documents/company-handbook.pdf",
+    updatedAt: "Mar 15, 2026",
+  },
+  {
+    id: 2,
+    name: "Brand Guidelines.pdf",
+    size: "5.1 MB",
+    category: "Design",
+    url: "/documents/brand-guidelines.pdf",
+    updatedAt: "Mar 10, 2026",
+  },
+  {
+    id: 3,
+    name: "Team Photo 2026.jpg",
+    size: "1.2 MB",
+    category: "Media",
+    url: "https://picsum.photos/seed/team/800/600",
+    updatedAt: "Feb 28, 2026",
+  },
+  {
+    id: 4,
+    name: "Project Proposal Template.docx",
+    size: "156 KB",
+    category: "Templates",
+    url: "/documents/project-proposal.docx",
+    updatedAt: "Mar 18, 2026",
+  },
+  {
+    id: 5,
+    name: "Office Floor Plan.png",
+    size: "890 KB",
+    category: "Operations",
+    url: "https://picsum.photos/seed/office/1200/800",
+    updatedAt: "Jan 5, 2026",
+  },
+  {
+    id: 6,
+    name: "API Documentation.md",
+    size: "127 KB",
+    category: "Technical",
+    url: "/documents/api-docs.md",
+    updatedAt: "Mar 20, 2026",
+  },
+  {
+    id: 7,
+    name: "Meeting Notes Template.docx",
+    size: "45 KB",
+    category: "Templates",
+    url: "/documents/meeting-notes.docx",
+    updatedAt: "Mar 12, 2026",
+  },
+  {
+    id: 8,
+    name: "Product Mockups.png",
+    size: "4.2 MB",
+    category: "Design",
+    url: "https://picsum.photos/seed/mockups/1000/700",
+    updatedAt: "Mar 19, 2026",
+  },
+  {
+    id: 9,
+    name: "README.md",
+    size: "8 KB",
+    category: "Technical",
+    url: "/documents/readme.md",
+    updatedAt: "Mar 21, 2026",
+  },
+];
+
 export default function Docs() {
+  const [documents, setDocuments] = useState(initialDocuments);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDateFilter, setSelectedDateFilter] = useState("all");
   const [viewingDoc, setViewingDoc] = useState(null);
+  const [deletingDoc, setDeletingDoc] = useState(null);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const searchRef = useRef(null);
   const dateDropdownRef = useRef(null);
+  
+  // Get unique categories from current documents
+  const categories = ["All", ...new Set(documents.map((d) => d.category))];
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -382,6 +433,19 @@ export default function Docs() {
       // Fallback: open in new tab if fetch fails (e.g., CORS issues)
       window.open(doc.url, "_blank", "noopener,noreferrer");
     }
+  };
+
+  const handleDeleteClick = (doc) => {
+    setDeletingDoc(doc);
+  };
+
+  const handleDeleteConfirm = (doc) => {
+    setDocuments(documents.filter((d) => d.id !== doc.id));
+    setDeletingDoc(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingDoc(null);
   };
 
   return (
@@ -541,6 +605,7 @@ export default function Docs() {
                   doc={doc}
                   onView={handleView}
                   onDownload={handleDownload}
+                  onDelete={handleDeleteClick}
                 />
               ))}
             </div>
@@ -554,6 +619,15 @@ export default function Docs() {
           doc={viewingDoc} 
           onClose={() => setViewingDoc(null)} 
           onDownload={handleDownload}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingDoc && (
+        <DeleteConfirmModal
+          doc={deletingDoc}
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
         />
       )}
     </Layout>
