@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X, File } from 'lucide-react';
 
 // Sample documents data (replacing filesystem-based loading)
@@ -123,6 +124,11 @@ export default function Documents() {
   const [dateTo, setDateTo] = useState('');
   const [previewDoc, setPreviewDoc] = useState(null);
   const [downloadNotice, setDownloadNotice] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get unique folders and types for filters
   const folders = useMemo(() => {
@@ -365,9 +371,9 @@ export default function Documents() {
         </div>
       </div>
 
-      {/* Preview Modal */}
-      {previewDoc && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setPreviewDoc(null)}>
+      {/* Preview Modal - rendered via portal to escape layout constraints */}
+      {mounted && previewDoc && createPortal(
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4" onClick={() => setPreviewDoc(null)}>
           <div className="bg-surface border border-border rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -435,15 +441,17 @@ export default function Documents() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* Download Notification */}
-      {downloadNotice && (
-        <div className="fixed bottom-6 right-6 bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center gap-3 z-50 animate-pulse">
+      {/* Download Notification - rendered via portal */}
+      {mounted && downloadNotice && createPortal(
+        <div className="fixed bottom-6 right-6 bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center gap-3 z-[9999] animate-pulse">
           <Download size={18} />
           <span className="text-sm">Downloading {downloadNotice}...</span>
-        </div>
+        </div>,
+        document.body
       )}
     </Layout>
   );
