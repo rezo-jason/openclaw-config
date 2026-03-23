@@ -3,45 +3,52 @@ import { FileText, Folder, Download, Eye } from 'lucide-react';
 import fs from 'fs';
 import path from 'path';
 
+// Recursively collect all files from a directory
+function getAllFiles(dirPath, basePath = '', arrayOfFiles = []) {
+  if (!fs.existsSync(dirPath)) return arrayOfFiles;
+  
+  const files = fs.readdirSync(dirPath);
+  
+  files.forEach(file => {
+    const fullPath = path.join(dirPath, file);
+    const relativePath = basePath ? `${basePath}/${file}` : file;
+    
+    if (fs.statSync(fullPath).isDirectory()) {
+      getAllFiles(fullPath, relativePath, arrayOfFiles);
+    } else {
+      arrayOfFiles.push({
+        file,
+        relativePath,
+        folder: basePath || 'root'
+      });
+    }
+  });
+  
+  return arrayOfFiles;
+}
+
 export async function getStaticProps() {
   const docsDir = path.join(process.cwd(), 'documents');
   const docs = [];
-  const folders = ['reports','proposals','quotes','contracts','finance','marketing','meeting-notes','research','templates'];
 
-  // Also check root documents folder
-  const rootFiles = fs.readdirSync(docsDir).filter(f =>
-    fs.statSync(path.join(docsDir, f)).isFile()
-  );
+  // Check if documents directory exists
+  if (!fs.existsSync(docsDir)) {
+    return { props: { docs: [] } };
+  }
 
-  rootFiles.forEach(file => {
+  // Recursively get all files
+  const allFiles = getAllFiles(docsDir);
+
+  allFiles.forEach(({ file, relativePath, folder }) => {
+    const parts = file.replace(/\.[^.]+$/, '').split('_');
     docs.push({
       title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
-      path: `/documents/${file}`,
-      rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${file}`,
-      created: new Date().toISOString().split('T')[0],
-      folder: 'root',
-      author: 'Agent',
+      path: `/documents/${relativePath}`,
+      rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${relativePath}`,
+      created: parts[0] || new Date().toISOString().split('T')[0],
+      folder: folder,
+      author: parts[1] || 'Agent',
       type: file.split('.').pop()
-    });
-  });
-
-  folders.forEach(folder => {
-    const folderPath = path.join(docsDir, folder);
-    if (!fs.existsSync(folderPath)) return;
-    const files = fs.readdirSync(folderPath).filter(f =>
-      fs.statSync(path.join(folderPath, f)).isFile()
-    );
-    files.forEach(file => {
-      const parts = file.replace(/\.[^.]+$/, '').split('_');
-      docs.push({
-        title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
-        path: `/documents/${folder}/${file}`,
-        rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${folder}/${file}`,
-        created: parts[0] || new Date().toISOString().split('T')[0],
-        folder: folder,
-        author: parts[1] || 'Agent',
-        type: file.split('.').pop()
-      });
     });
   });
 
