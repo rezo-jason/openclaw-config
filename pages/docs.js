@@ -1,6 +1,6 @@
 import Layout from '@/components/Layout';
 import { useState, useMemo } from 'react';
-import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X, FileIcon } from 'lucide-react';
+import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X, File } from 'lucide-react';
 
 // Sample documents data (replacing filesystem-based loading)
 const initialDocs = [
@@ -388,7 +388,7 @@ export default function Documents() {
             </div>
 
             <div className="bg-surface-elevated border border-border rounded-lg p-8 mb-4 flex flex-col items-center justify-center text-center">
-              <FileIcon size={48} className="text-gray-500 mb-3" />
+              <File size={48} className="text-gray-500 mb-3" />
               <p className="text-gray-400 text-sm">Document preview not available</p>
               <p className="text-gray-500 text-xs mt-1">Download the file to view its contents</p>
             </div>
