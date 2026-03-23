@@ -1,6 +1,6 @@
 import Layout from '@/components/Layout';
 import { useState, useMemo } from 'react';
-import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X } from 'lucide-react';
+import { FileText, Folder, Download, Eye, Trash2, Search, Calendar, X, FileIcon } from 'lucide-react';
 
 // Sample documents data (replacing filesystem-based loading)
 const initialDocs = [
@@ -121,6 +121,8 @@ export default function Documents() {
   const [typeFilter, setTypeFilter] = useState('All Types');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [previewDoc, setPreviewDoc] = useState(null);
+  const [downloadNotice, setDownloadNotice] = useState(null);
 
   // Get unique folders and types for filters
   const folders = useMemo(() => {
@@ -164,6 +166,15 @@ export default function Documents() {
     if (confirm('Are you sure you want to remove this document from the list?')) {
       setDocs(docs.filter(d => d.path !== docPath));
     }
+  };
+
+  const handleView = (doc) => {
+    setPreviewDoc(doc);
+  };
+
+  const handleDownload = (doc) => {
+    setDownloadNotice(doc.filename);
+    setTimeout(() => setDownloadNotice(null), 3000);
   };
 
   const clearFilters = () => {
@@ -302,10 +313,18 @@ export default function Documents() {
                     <span className="text-xs text-gray-500 font-mono">{doc.created}</span>
                   </div>
                   <div className="col-span-2 flex items-center justify-end gap-2">
-                    <button className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-primary transition-colors" title="Preview">
+                    <button 
+                      onClick={() => handleView(doc)}
+                      className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-primary transition-colors" 
+                      title="Preview"
+                    >
                       <Eye size={14} />
                     </button>
-                    <button className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-green-400 transition-colors" title="Download">
+                    <button 
+                      onClick={() => handleDownload(doc)}
+                      className="p-1.5 bg-surface border border-border rounded hover:bg-surface-elevated text-gray-400 hover:text-green-400 transition-colors" 
+                      title="Download"
+                    >
                       <Download size={14} />
                     </button>
                     <button 
@@ -322,6 +341,87 @@ export default function Documents() {
           </div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {previewDoc && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setPreviewDoc(null)}>
+          <div className="bg-surface border border-border rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded ${
+                  previewDoc.type === 'pdf' ? 'bg-red-500/20 text-red-400' :
+                  previewDoc.type === 'docx' || previewDoc.type === 'xlsx' ? 'bg-blue-500/20 text-blue-400' :
+                  previewDoc.type === 'md' ? 'bg-purple-500/20 text-purple-400' :
+                  'bg-primary/20 text-primary'
+                }`}>
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{previewDoc.title}</h3>
+                  <p className="text-sm text-gray-500">{previewDoc.filename}</p>
+                </div>
+              </div>
+              <button onClick={() => setPreviewDoc(null)} className="text-gray-500 hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="bg-surface-elevated border border-border rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Folder</span>
+                  <p className="text-white">{previewDoc.folder}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Type</span>
+                  <p className="text-white uppercase">{previewDoc.type}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Author</span>
+                  <p className="text-white">{previewDoc.author}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Created</span>
+                  <p className="text-white">{previewDoc.created}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-surface-elevated border border-border rounded-lg p-8 mb-4 flex flex-col items-center justify-center text-center">
+              <FileIcon size={48} className="text-gray-500 mb-3" />
+              <p className="text-gray-400 text-sm">Document preview not available</p>
+              <p className="text-gray-500 text-xs mt-1">Download the file to view its contents</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={() => {
+                  handleDownload(previewDoc);
+                  setPreviewDoc(null);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors"
+              >
+                <Download size={16} />
+                Download
+              </button>
+              <button 
+                onClick={() => setPreviewDoc(null)}
+                className="px-4 py-2.5 bg-surface-elevated border border-border text-gray-400 rounded-lg hover:text-white transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Notification */}
+      {downloadNotice && (
+        <div className="fixed bottom-6 right-6 bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center gap-3 z-50 animate-pulse">
+          <Download size={18} />
+          <span className="text-sm">Downloading {downloadNotice}...</span>
+        </div>
+      )}
     </Layout>
   );
 }
