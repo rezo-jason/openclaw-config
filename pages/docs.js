@@ -27,30 +27,35 @@ function getAllFiles(dirPath, basePath = '', arrayOfFiles = []) {
   return arrayOfFiles;
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const docsDir = path.join(process.cwd(), 'documents');
   const docs = [];
 
-  // Check if documents directory exists
-  if (!fs.existsSync(docsDir)) {
+  try {
+    // Check if documents directory exists
+    if (!fs.existsSync(docsDir)) {
+      return { props: { docs: [] } };
+    }
+
+    // Recursively get all files
+    const allFiles = getAllFiles(docsDir);
+
+    allFiles.forEach(({ file, relativePath, folder }) => {
+      const parts = file.replace(/\.[^.]+$/, '').split('_');
+      docs.push({
+        title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
+        path: `/documents/${relativePath}`,
+        rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${relativePath}`,
+        created: parts[0] || new Date().toISOString().split('T')[0],
+        folder: folder,
+        author: parts[1] || 'Agent',
+        type: file.split('.').pop()
+      });
+    });
+  } catch (error) {
+    console.error('Error reading documents:', error);
     return { props: { docs: [] } };
   }
-
-  // Recursively get all files
-  const allFiles = getAllFiles(docsDir);
-
-  allFiles.forEach(({ file, relativePath, folder }) => {
-    const parts = file.replace(/\.[^.]+$/, '').split('_');
-    docs.push({
-      title: file.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, ''),
-      path: `/documents/${relativePath}`,
-      rawUrl: `https://raw.githubusercontent.com/rezo-jason/openclaw-config/main/documents/${relativePath}`,
-      created: parts[0] || new Date().toISOString().split('T')[0],
-      folder: folder,
-      author: parts[1] || 'Agent',
-      type: file.split('.').pop()
-    });
-  });
 
   return { props: { docs } };
 }
