@@ -70,6 +70,17 @@ const allTasks = [
     createdAt: "4 days ago",
   },
   {
+    id: 17,
+    title: "test",
+    project: "Mission Control Compliance Test",
+    agent: "Planner",
+    status: "active",
+    priority: "medium",
+    progress: 0,
+    dueDate: "Today",
+    createdAt: "just now",
+  },
+  {
     id: 16,
     title: "Test Task — Gmail Integration Setup",
     project: "System Setup",
