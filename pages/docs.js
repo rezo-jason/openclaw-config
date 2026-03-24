@@ -149,6 +149,51 @@ const initialDocs = [
     type: "pdf",
     filename: "SUPERCHARGED_TRADIES_COVER_TEST.pdf"
   },
+  {
+    title: "Mission Control Decision Engine",
+    path: "/documents/MISSION_CONTROL_DECISION_ENGINE.md",
+    created: "2026-03-24",
+    folder: "reports",
+    author: "Main Coordinator",
+    type: "md",
+    filename: "MISSION_CONTROL_DECISION_ENGINE.md"
+  },
+  {
+    title: "Mission Control Enforcement Protocol",
+    path: "/documents/MISSION_CONTROL_PROTOCOL.md",
+    created: "2026-03-24",
+    folder: "reports",
+    author: "Main Coordinator",
+    type: "md",
+    filename: "MISSION_CONTROL_PROTOCOL.md"
+  },
+  {
+    title: "Supercharged Tradies — Numbers 1 to 10",
+    path: "/documents/Supercharged_Tradies.pdf",
+    created: "2026-03-24",
+    folder: "marketing",
+    author: "Main Coordinator",
+    type: "pdf",
+    filename: "Supercharged_Tradies.pdf"
+  },
+  {
+    title: "Program 1 — Start Your Trade Business Mastermind (Amended)",
+    path: "/documents/PROGRAM1_START_YOUR_TRADE_BUSINESS_MASTERMIND_BRANDED.pdf",
+    created: "2026-03-24",
+    folder: "proposals",
+    author: "Main Coordinator",
+    type: "pdf",
+    filename: "PROGRAM1_START_YOUR_TRADE_BUSINESS_MASTERMIND_BRANDED.pdf"
+  },
+  {
+    title: "Program 2 — From Tradie to Business Owner (Amended)",
+    path: "/documents/PROGRAM2_FROM_TRADIE_TO_BUSINESS_OWNER_BRANDED.pdf",
+    created: "2026-03-24",
+    folder: "proposals",
+    author: "Main Coordinator",
+    type: "pdf",
+    filename: "PROGRAM2_FROM_TRADIE_TO_BUSINESS_OWNER_BRANDED.pdf"
+  },
 ];
 
 export default function Documents() {
