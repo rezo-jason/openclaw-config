@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { name: "Tasks", href: "/tasks", icon: CheckSquare },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare, color: "pink" },
   { name: "Agents", href: "/agents", icon: Bot },
   { name: "Content", href: "/content", icon: FileText },
   { name: "Approvals", href: "/approvals", icon: CheckCircle },
@@ -67,11 +67,15 @@ export default function Sidebar() {
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
                     isActive
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? item.color === "pink"
+                        ? "bg-pink-500/10 text-pink-400 border border-pink-500/20"
+                        : "bg-primary/10 text-primary border border-primary/20"
+                      : item.color === "pink"
+                        ? "text-pink-400 hover:text-pink-300 hover:bg-pink-500/5"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  <Icon size={18} />
+                  <Icon size={18} className={item.color === "pink" ? "text-pink-400" : ""} />
                   <span>{item.name}</span>
                 </Link>
               </li>
