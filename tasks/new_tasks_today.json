@@ -1,0 +1,10 @@
+  "project":"Mission Control Compliance Test",
+  "tasks":[
+    {"name":"Add today reminder","location":"/tasks","assigned_to":"Planner","status":"active","due":"today"},
+    {"name":"Edit Cliff coaching invoices","location":"/tasks","assigned_to":"Finance & Compliance","status":"active","due":"today"},
+    {"name":"Get string line","location":"/tasks","assigned_to":"Memory / Research","status":"active","due":"today"},
+    {"name":"Quote Ben Wall","location":"/tasks","assigned_to":"Manus Doc Creator","status":"active","due":"today"}
+  ]
+}
+JSON
+ echo DONE; ls -l /Users/jasonrezo/openclaw-config/tasks/new_tasks_today.json

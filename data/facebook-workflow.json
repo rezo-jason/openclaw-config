@@ -1,0 +1,105 @@
+{
+  "workflow": "Supercharged Tradies Facebook Content",
+  "updated": "2026-04-04",
+  "stages": ["ideas", "drafts", "approved", "posted"],
+  "categories": ["Educational", "Authority", "Offer", "Story", "Social Proof"],
+  "tone": "practical, direct, clear, useful, business-focused, no corporate waffle",
+  "approval_required": true,
+  "auto_publish": false,
+  "ideas": [
+    {
+      "id": 1,
+      "week": "2026-04-07",
+      "category": "Educational",
+      "title": "Why 90% of tradies undercharge and how to fix it in 10 minutes",
+      "status": "draft",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 2,
+      "week": "2026-04-07",
+      "category": "Authority",
+      "title": "Material prices just jumped again — here is exactly what changed this week",
+      "status": "draft",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 3,
+      "week": "2026-04-07",
+      "category": "Offer",
+      "title": "Free tool: calculate your real charge-out rate in 60 seconds",
+      "status": "draft",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 4,
+      "week": "2026-04-07",
+      "category": "Story",
+      "title": "From solo tradie to $20K weeks — what actually changed",
+      "status": "draft",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 5,
+      "week": "2026-04-07",
+      "category": "Social Proof",
+      "title": "AI just saved this plumber 6 hours a week on quoting alone",
+      "status": "draft",
+      "created": "2026-04-04"
+    }
+  ],
+  "drafts": [
+    {
+      "id": 1,
+      "idea_id": 1,
+      "category": "Educational",
+      "hook": "You are losing money on every job and you do not even know it.",
+      "body": "Most tradies set their rate years ago and never touched it. Meanwhile materials are up 30%, fuel is through the roof, and your overheads have doubled. If you have not recalculated your charge-out rate in the last 6 months you are working for less than you think. Here is the quick fix: add up every cost for the week. Divide by billable hours. Add your margin. That is your real rate. If it is lower than what you are charging, you just found the leak.",
+      "cta": "Drop a comment if you want the free charge-out rate calculator.",
+      "status": "awaiting_approval",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 2,
+      "idea_id": 2,
+      "category": "Authority",
+      "hook": "PVC up 27%. Polyethylene up 36%. Polypropylene up 31%. Effective April 17.",
+      "body": "Iplex just notified Reece Plumbing of massive price hikes hitting in two weeks. Bitumen is tipped to rise 50%+. Concrete is now $320-490 per cubic metre nationally. If you quoted a job last month and have not started yet, your margins just got eaten. Check every open quote. Update pricing. Lock in materials now if you can.",
+      "cta": "Tag a tradie who needs to see this before April 17.",
+      "status": "awaiting_approval",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 3,
+      "idea_id": 3,
+      "category": "Offer",
+      "hook": "Do you actually know your real charge-out rate? Most tradies guess. Guessing costs you thousands.",
+      "body": "We built a simple calculator that takes your weekly costs, your hours, and your margin target and spits out your exact charge-out rate. No spreadsheet. No accountant. Takes 60 seconds. Dozens of tradies have already used it this month and most found they were undercharging by $15-40 per hour.",
+      "cta": "Comment RATE below and I will send it to you.",
+      "status": "awaiting_approval",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 4,
+      "idea_id": 4,
+      "category": "Story",
+      "hook": "Three years ago I was quoting jobs on the back of receipts and hoping the numbers worked out.",
+      "body": "No systems. No tracking. Just grinding 60 hour weeks and wondering where the money went. The shift was not working harder. It was building systems that did the thinking for me. Quoting templates. Job cost tracking. Automated scheduling. One change at a time. Now the business runs without me being in every conversation. That is what Supercharged Tradies is about. Not working more. Working smarter with systems that actually fit a trade business.",
+      "cta": "What is the one thing in your business you wish ran itself? Tell me below.",
+      "status": "awaiting_approval",
+      "created": "2026-04-04"
+    },
+    {
+      "id": 5,
+      "idea_id": 5,
+      "category": "Social Proof",
+      "hook": "A plumber in Brisbane just cut his quoting time from 2 hours to 20 minutes using AI.",
+      "body": "Same quality quotes. Same detail. Same win rate. Just faster. He used an AI quoting tool to pull his standard scope items, auto-fill pricing from his rate card, and generate a branded PDF in minutes instead of hours. That is 6 hours a week back. 6 hours he now spends on actual billable work. AI is not replacing tradies. It is giving the smart ones their time back.",
+      "cta": "Want to see how AI quoting works for your trade? Drop your trade below and I will show you.",
+      "status": "awaiting_approval",
+      "created": "2026-04-04"
+    }
+  ],
+  "approved": [],
+  "posted": []
+}
